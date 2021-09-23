@@ -1,55 +1,94 @@
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vue Sample</title>
-  </head>
-  <body>
+<template>
+<!-- App.vue -->
+  <div id="app">
+    <img alt="Vue logo" src="./assets/KBO.png" width="100%" />
+    <component1 msg="This Part is Component1" />
+    <component2 msg="This Part is Component2" />
+    <button v-on:click="fetchData">get Data</button>
+    <child></child>
+  </div>
+</template>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+import Component1 from "./components/Component1";
+import Component2 from "./components/Component2";
+import Child from "./components/Child";
 
-      <h2> 입력받은 문자열을 표시하는 예제</h2>
-
-    <div id="app">
-        <!-- v-on:click으로 클릭이벤트 설정 가능 -->
-        <button v-on:click = "countUp"> ++ Button</button>
-        <p>{{count}}</p> 
-        
-        <!-- v-bind는 생략가능. => button disabled = false , click = " " 와 같이 구성된다고 본다. -->
-        <button v-bind:disabled="click" v-on:click="oneClick">한 번만 클릭 가능</button>
-        <p>{{text}}</p>
-
-        <!-- 함수 Param 전달 -->
-        <button v-on:click= "paramClick(10)">10씩 증가</button>
-        <p>{{tenCount}}</p>
-
-        <!-- 특정 키를 누를 때 함수 실행(포커스 상태에서) -->
-        <input v-on:keyup.enter="alertClick">
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script>
-        var vm = new Vue({
-            el: '#app',
-            data: {
-                count: 0,
-                click: false,
-                text: "",
-                tenCount: 0
-            },
-            methods: {
-                countUp() {
-                    this.count++                  
-                },
-                oneClick() {
-                    this.click = true;
-                    this.text = "Click!";
-                },
-                paramClick(num) {
-                    this.tenCount += num;                         
-                },
-                alertClick() {
-                    alert("Enter!");
-                }
-            }
+export default {
+  el: "App",
+  components: {
+    component1: Component1,
+    component2: Component2,
+    child: Child,
+  },
+  data: function () {
+    return {
+      rootData: 10,
+    };
+  },
+  methods: {
+    fetchData: function () {
+      axios
+        .get("https://jsonplaceholder.typicode.com/users/")
+        .then(function (response) {
+          console.log(response);
         })
-    </script>
-  </body>
-</html>
+        .catch(function (err) {
+          console.log(err);
+        });
+    },
+  },
+};
+</script>
+
+
+
+<template>
+  <!-- Child.vue -->
+  <div>
+    Child
+    <child-child></child-child>
+  </div>
+</template>
+
+<script>
+import ChildAndChild from "./ChildAndChild";
+
+export default {
+  name: "Child",
+  data: function () {
+    return {
+      childData: 20,
+    };
+  },
+  components: {
+    "child-child": ChildAndChild,
+  },
+};
+</script>
+
+
+
+<template>
+  <!-- ChildAndChild.vue -->
+  <div>
+    Child And Child
+    <button @click="showRootLog">Root 데이터 조회</button>
+    <button @click="showParentLog">Parent 데이터 조회</button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "ChildAndChild",
+  methods: {
+    showRootLog: function () {
+      console.log("rootData", this.$root.rootData);
+    },
+    showParentLog: function () {
+      console.log("childData", this.$parent.childData);
+    },
+  },
+};
+</script>
+
